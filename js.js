@@ -1,6 +1,7 @@
 var getTime = (milli) => {
   let time = new Date(milli);
-  time.setMinutes(time.getMinutes() - 30);
+  const lunch_dur = parseInt(document.getElementById("lunch_duration").value, 10);
+  time.setMinutes(time.getMinutes() - lunch_dur);
   let hours = time.getUTCHours();
   let minutes = time.getUTCMinutes();
   return hours + ":" + minutes;

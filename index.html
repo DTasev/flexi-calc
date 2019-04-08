@@ -4,8 +4,12 @@
 <script src='js.js'></script>
 </head>
 <body>
+  <label>
+    Lunch
+    <input type="number" step="1" min="30" value="30" id="lunch_duration">
+  </label>
   <p>
-    Note: subtracts 30mins for lunch from all work days (Mon-Fri)
+    Note: subtracts lunch from all work days (Mon-Fri)
   </p>
   <div>
     <div>
@@ -51,7 +55,6 @@
       <div class="time-result" style="display: inline-block;"><span id="day_Friday_result"></span></div>
     </div>
   </div>
-  <button>Do thing</button>
   <div><label>Total Worked</label>
     <div id="result_total"></div>
   </div>

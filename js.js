@@ -1,13 +1,16 @@
-var getTime = (milli) => {
+const localStorageKey = "flexicalc_data"
+const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+var getTime = (milli, lunch_duration) => {
   let time = new Date(milli);
-  const lunch_dur = parseInt(document.getElementById("lunch_duration").value, 10);
+  const lunch_dur = parseInt(lunch_duration, 10);
   time.setMinutes(time.getMinutes() - lunch_dur);
-  let hours = time.getUTCHours();
-  let minutes = time.getUTCMinutes();
-  return hours + ":" + minutes;
+  const hours = time.getUTCHours();
+  const minutes = time.getUTCMinutes();
+  const minutes_string = minutes < 10 ? "0" + minutes : minutes;
+  return hours + ":" + minutes_string;
 }
-function add_all() {
-  let days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+function calculate_weekly_totals() {
   let totalH = 0;
   let totalM = 0;
   for (const day_str of days) {
@@ -29,15 +32,48 @@ function add_all() {
     totalM = totalM % 60;
   }
 
-  document.getElementById("result_total").textContent = totalH + ":" + totalM;
-  document.getElementById("result_minus_expected_total").textContent = (totalH - 37) + ":" + totalM;
+  const minutes_string = totalM < 10 ? "0" + totalM : totalM;
+  document.getElementById("result_total").textContent = totalH + ":" + minutes_string;
+  // if minutes are under 10 then append 0 at the front
+  document.getElementById("result_minus_expected_total").textContent = (totalH - 37) + ":" + minutes_string;
+}
+function cache_all_fields() {
+  let days_data = {};
+  for (const day of days) {
+    const inp = document.getElementById("day_" + day + "_in");
+    const out = document.getElementById("day_" + day + "_out");
+    const lunch = document.getElementById("day_" + day + "_lunch_duration");
+    days_data[day] = { "in": inp.value, "out": out.value, "lunch_duration": lunch.value };
+  }
+
+  window.localStorage.setItem(localStorageKey, JSON.stringify(days_data));
 
 }
-function make_diff(day_str) {
+function make_diff(day_str, cache = true) {
   const inp = document.getElementById("day_" + day_str + "_in");
   const out = document.getElementById("day_" + day_str + "_out");
+  const lunch = document.getElementById("day_" + day_str + "_lunch_duration");
   const result = document.getElementById("day_" + day_str + "_result");
 
-  result.textContent = getTime(new Date("November 02, 2017 " + out.value) - new Date("November 02, 2017 " + inp.value));
-  add_all();
+  result.textContent = getTime(new Date("November 02, 2017 " + out.value) - new Date("November 02, 2017 " + inp.value), lunch.value);
+  calculate_weekly_totals();
+  if (cache) {
+    cache_all_fields();
+  }
+}
+
+function loadFromCache() {
+  const days_data = JSON.parse(window.localStorage.getItem(localStorageKey));
+  if (days_data) {
+    for (const day of days) {
+      const data = days_data[day];
+
+      for (const field of Object.keys(data)) {
+        const value = data[field];
+        const f = document.getElementById("day_" + day + "_" + field);
+        f.value = value;
+      }
+      make_diff(day, false);
+    }
+  }
 }

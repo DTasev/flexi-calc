@@ -46,6 +46,8 @@ function cache_all_fields() {
     days_data[day] = { "in": inp.value, "out": out.value, "lunch_duration": lunch.value };
   }
 
+  days_data["toil"] = document.getElementById("toil").value;
+
   window.localStorage.setItem(localStorageKey, JSON.stringify(days_data));
 
 }
@@ -75,5 +77,7 @@ function loadFromCache() {
       }
       make_diff(day, false);
     }
+
+    document.getElementById("toil").value = days_data["toil"];
   }
 }
